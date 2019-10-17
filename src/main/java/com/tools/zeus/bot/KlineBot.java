@@ -3,6 +3,7 @@ package com.tools.zeus.bot;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.mongodb.WriteResult;
 import com.tools.zeus.entity.KlineDO;
 import com.tools.zeus.service.KlineService;
 import okhttp3.*;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 @Component
@@ -33,8 +33,7 @@ public class KlineBot {
     @Value("${huobi.kline}")
     private String[] klineType;
 
-    @PostConstruct
-    private void klineWork() throws InterruptedException {
+    public void klineWork() throws InterruptedException {
         for (int i = 0; i < symbolList.length; i++) {
             for (int j = 0; j < klineType.length; j++) {
                 StringBuilder sb = new StringBuilder(apiUrl);
@@ -68,7 +67,7 @@ public class KlineBot {
     }
 
 
-    private void writeMongo(JSONObject json) {
+    public void writeMongo(JSONObject json) {
         String ch = json.getString("ch");
         String[] str = ch.split("\\.");
         String symbol = str[1];
@@ -77,7 +76,7 @@ public class KlineBot {
 
         JSONArray jsonArray = json.getJSONArray("data");
 
-        LOG.info("打印 array size:[{}]",jsonArray.size());
+        LOG.info("打印 array size:[{}]", jsonArray.size());
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject item = (JSONObject) jsonArray.get(i);
             LOG.info("打印元素: [{}], [{}]", ch, item.toString());
@@ -88,7 +87,8 @@ public class KlineBot {
             klineDO.setPair(pair);
             klineDO.setkTime(Integer.valueOf(klineDO.getId()));
             klineDO.setId(symbol + klineDO.getId() + kType);
-            klineService.updateKline(klineDO);
+            WriteResult result = klineService.updateKline(klineDO);
+            //LOG.info("打印执行结果:[{}]",result.toString());
         }
 //        jsonArray.stream().forEach(item -> {
 //            LOG.info("打印元素: [{}], [{}]",ch, item.toString());

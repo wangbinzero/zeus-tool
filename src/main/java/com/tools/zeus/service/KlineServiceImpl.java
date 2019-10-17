@@ -35,6 +35,11 @@ public class KlineServiceImpl implements KlineService {
         return null;
     }
 
+    @Override
+    public void test() {
+        LOG.info("测试");
+    }
+
 
     private void updateNew(Query query, KlineDO klineDO) {
         Update update = new Update();

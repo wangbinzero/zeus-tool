@@ -6,4 +6,6 @@ import com.tools.zeus.entity.KlineDO;
 public interface KlineService {
 
     WriteResult updateKline(KlineDO klineDO);
+
+    void test();
 }
